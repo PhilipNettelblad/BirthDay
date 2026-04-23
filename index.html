@@ -43,16 +43,6 @@
     color: #ffccff;
     text-shadow: 0 0 5px #ff66ff, 0 0 20px #ff00ff, 0 0 40px #9900ff;
     margin-bottom: 2rem;
-    animation: glitch 2s infinite;
-  }
-
-  @keyframes glitch {
-    0% { transform: translate(0); }
-    20% { transform: translate(-2px, 2px); }
-    40% { transform: translate(2px, -2px); }
-    60% { transform: translate(2px, 2px); }
-    80% { transform: translate(-2px, -2px); }
-    100% { transform: translate(0); }
   }
 
   #countdown {
@@ -68,21 +58,13 @@
     border: 2px solid #ff4dff;
     padding: 1rem;
     border-radius: 12px;
-    text-align: center;
     box-shadow: 0 0 10px #ff00ff, inset 0 0 10px #9900ff;
-    animation: pulse 2s infinite;
     flex: 1 1 120px;
     min-width: 100px;
   }
 
-  @keyframes pulse {
-    0% { box-shadow: 0 0 10px #ff00ff; }
-    50% { box-shadow: 0 0 25px #00ffff; }
-    100% { box-shadow: 0 0 10px #ff00ff; }
-  }
-
   .box div {
-    font-size: clamp(1.5rem, 6vw, 2.2rem);
+    font-size: 2rem;
   }
 
   .box span {
@@ -93,35 +75,34 @@
 
   #message {
     margin-top: 2rem;
-    font-size: clamp(1rem, 4vw, 1.5rem);
+    font-size: 1.3rem;
     color: #ffccff;
     text-shadow: 0 0 10px #ff00ff;
     min-height: 40px;
   }
 
-  /* 🔧 HEMLIG DEBUG-KNAPP */
+  /* 🔘 KNAPP LÄNGS NERE I HÖRNET */
   #debugReveal {
-    position: absolute;
+    position: fixed;
     bottom: 10px;
     right: 10px;
-    width: 10px;
-    height: 10px;
-    opacity: 0.02;
-    background: transparent;
-    border: none;
+
+    padding: 6px 10px;
+    font-size: 10px;
+
+    color: #ffccff;
+    background: rgba(255, 0, 255, 0.15);
+    border: 1px solid rgba(255, 0, 255, 0.3);
+    border-radius: 8px;
+
+    z-index: 999999;
     cursor: pointer;
   }
 
-  @media (max-width: 480px) {
-    #countdown {
-      gap: 0.6rem;
-    }
-
-    .box {
-      padding: 0.8rem;
-    }
+  #debugReveal:hover {
+    background: rgba(255, 0, 255, 0.25);
   }
-</style>
+  </style>
 </head>
 
 <body>
@@ -137,8 +118,8 @@
 
 <div id="message"></div>
 
-<!-- 🔧 HIDDEN BUTTON -->
-<button id="debugReveal"></button>
+<!-- 🔘 KNAPP -->
+<button id="debugReveal" onclick="forceReveal()">DEBUG</button>
 
 <script>
 const friends = [
@@ -159,19 +140,6 @@ const friends = [
   { name: "Simon", month: 10, day: 21 }
 ];
 
-function getNextEvent(now) {
-  const year = now.getFullYear();
-
-  let list = friends.map(f => {
-    let d = new Date(year, f.month - 1, f.day, 8, 15, 0);
-    if (d < now) d = new Date(year + 1, f.month - 1, f.day, 8, 15, 0);
-    return { ...f, date: d };
-  });
-
-  list.sort((a,b) => a.date - b.date);
-  return list[0];
-}
-
 function forceReveal() {
   const now = new Date();
 
@@ -180,50 +148,31 @@ function forceReveal() {
     f.day === now.getDate()
   );
 
-  const msg = document.getElementById("message");
-
   if (today) {
-    msg.innerHTML = `🎉 ${today.name} fyller år idag 🎂`;
+    document.getElementById("message").innerHTML =
+      "🎉 " + today.name + " fyller år idag 🎂";
   }
 }
 
 function update() {
   const now = new Date();
-  const msg = document.getElementById("message");
 
-  const next = getNextEvent(now);
+  const next = friends.map(f => {
+    let d = new Date(now.getFullYear(), f.month - 1, f.day);
+    if (d < now) d = new Date(now.getFullYear() + 1, f.month - 1, f.day);
+    return d;
+  }).sort((a,b) => a - b)[0];
 
-  const today = friends.find(f =>
-    f.month === now.getMonth() + 1 &&
-    f.day === now.getDate()
-  );
+  const diff = next - now;
 
-  const revealTime = new Date(
-    now.getFullYear(),
-    now.getMonth(),
-    now.getDate(),
-    8, 15, 0
-  );
-
-  if (today && now >= revealTime && now < new Date(revealTime.getTime() + 24*60*60*1000)) {
-    msg.innerHTML = `🎉 ${today.name} fyller år idag 🎂`;
-  } else {
-    msg.innerHTML = "";
-  }
-
-  const diff = next.date - now;
-
-  document.getElementById("days").textContent = Math.floor(diff / (1000*60*60*24));
-  document.getElementById("hours").textContent = Math.floor((diff / (1000*60*60)) % 24);
-  document.getElementById("minutes").textContent = Math.floor((diff / (1000*60)) % 60);
-  document.getElementById("seconds").textContent = Math.floor((diff / 1000) % 60);
+  document.getElementById("days").textContent = Math.floor(diff / 86400000);
+  document.getElementById("hours").textContent = Math.floor(diff / 3600000 % 24);
+  document.getElementById("minutes").textContent = Math.floor(diff / 60000 % 60);
+  document.getElementById("seconds").textContent = Math.floor(diff / 1000 % 60);
 }
 
 setInterval(update, 1000);
 update();
-
-/* 🔧 bind hidden button */
-document.getElementById("debugReveal").addEventListener("click", forceReveal);
 </script>
 
 </body>
