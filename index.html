@@ -82,7 +82,6 @@
     min-height: 40px;
   }
 
-  /* 🔘 KNAPP */
   #revealNext {
     position: fixed;
     bottom: 10px;
@@ -101,7 +100,6 @@
     cursor: pointer;
   }
 
-  /* 🎆 CANVAS */
   #fireworks {
     position: fixed;
     top: 0;
@@ -163,9 +161,27 @@ function getNextEvent(now) {
   return list[0];
 }
 
-/* ⏱ COUNTDOWN */
+/* ⏱ COUNTDOWN (FIXAD LOGIK) */
 function update() {
   const now = new Date();
+
+  const todayBirthday = friends.find(f =>
+    f.month === now.getMonth() + 1 &&
+    f.day === now.getDate()
+  );
+
+  if (todayBirthday) {
+    document.getElementById("days").textContent = "0";
+    document.getElementById("hours").textContent = "0";
+    document.getElementById("minutes").textContent = "0";
+    document.getElementById("seconds").textContent = "0";
+
+    document.getElementById("message").innerHTML =
+      `🎉 ${todayBirthday.name} fyller år idag 🎂`;
+
+    return;
+  }
+
   const next = getNextEvent(now);
   const diff = next.date - now;
 
@@ -216,7 +232,6 @@ function loop() {
   });
 
   particles = particles.filter(p => p.alpha > 0);
-
   requestAnimationFrame(loop);
 }
 loop();
@@ -231,7 +246,7 @@ document.getElementById("revealNext").onclick = function () {
   explode(window.innerWidth / 2, window.innerHeight / 2);
 };
 
-/* 🎂 AUTO FIREWORKS OM NÅGON FYLLER ÅR IDAG */
+/* 🎂 AUTO FIREWORKS */
 function checkBirthday() {
   const now = new Date();
 
@@ -241,9 +256,6 @@ function checkBirthday() {
   );
 
   if (today) {
-    document.getElementById("message").innerHTML =
-      `🎉 ${today.name} fyller år idag 🎂`;
-
     explode(window.innerWidth / 2, window.innerHeight / 2);
   }
 }
