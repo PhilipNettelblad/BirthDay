@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Födelsedags Countdown</title>
+  <title>Birthday Countdown</title>
 
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
 
@@ -39,10 +39,7 @@
     h1 {
       font-size: 2.8rem;
       color: #ffccff;
-      text-shadow:
-        0 0 5px #ff66ff,
-        0 0 20px #ff00ff,
-        0 0 40px #9900ff;
+      text-shadow: 0 0 5px #ff66ff, 0 0 20px #ff00ff, 0 0 40px #9900ff;
       margin-bottom: 2rem;
       animation: glitch 2s infinite;
       text-align: center;
@@ -70,9 +67,7 @@
       padding: 1.2rem 1.5rem;
       border-radius: 12px;
       text-align: center;
-      box-shadow:
-        0 0 10px #ff00ff,
-        inset 0 0 10px #9900ff;
+      box-shadow: 0 0 10px #ff00ff, inset 0 0 10px #9900ff;
       animation: pulse 2s infinite;
       min-width: 100px;
     }
@@ -100,84 +95,91 @@
       text-shadow: 0 0 10px #ff00ff;
       text-align: center;
     }
-
-    footer {
-      position: absolute;
-      bottom: 20px;
-      font-size: 0.8rem;
-      color: #777;
-    }
   </style>
 </head>
 
 <body>
 
-  <h1>🎉 FÖDELSEDAGS COUNTDOWN 🎂</h1>
+<h1>🎂 BIRTHDAY SYSTEM 🎉</h1>
 
-  <div id="countdown">
-    <div class="box"><div id="days">00</div><span>DAGAR</span></div>
-    <div class="box"><div id="hours">00</div><span>TIMMAR</span></div>
-    <div class="box"><div id="minutes">00</div><span>MIN</span></div>
-    <div class="box"><div id="seconds">00</div><span>SEK</span></div>
-  </div>
+<div id="countdown">
+  <div class="box"><div id="days">00</div><span>DAGAR</span></div>
+  <div class="box"><div id="hours">00</div><span>TIMMAR</span></div>
+  <div class="box"><div id="minutes">00</div><span>MIN</span></div>
+  <div class="box"><div id="seconds">00</div><span>SEK</span></div>
+</div>
 
-  <div id="message"></div>
-
-  <footer>Birthday system online...</footer>
+<div id="message"></div>
 
 <script>
 const friends = [
-  { name: "Anna", month: 1, day: 12 },
-  { name: "Erik", month: 2, day: 3 },
-  { name: "Sara", month: 3, day: 18 },
-  { name: "Johan", month: 5, day: 9 },
-  { name: "Maja", month: 6, day: 22 },
-  { name: "Lukas", month: 8, day: 14 },
-  { name: "Elin", month: 10, day: 2 },
-  { name: "Oscar", month: 12, day: 28 }
+  { name: "Ludvig", month: 1, day: 31 },
+  { name: "Pontus", month: 4, day: 10 },
+  { name: "Philip", month: 3, day: 11 },
+  { name: "Daniel", month: 6, day: 26 },
+  { name: "Jonathan", month: 7, day: 29 },
+  { name: "Douglas", month: 5, day: 19 },
+  { name: "Hanno", month: 1, day: 1 },
+  { name: "Håkan", month: 5, day: 8 },
+  { name: "Sebastian", month: 10, day: 8 },
+  { name: "Tony", month: 6, day: 7 },
+  { name: "Felix", month: 5, day: 22 },
+  { name: "Malin", month: 11, day: 2 },
+  { name: "Nike", month: 9, day: 19 },
+  { name: "Christoffer", month: 8, day: 31 },
+  { name: "Simon", month: 10, day: 21 }
 ];
 
-function getNext(now) {
+// nästa event = födelsedag kl 08:15
+function getNextEvent(now) {
   const year = now.getFullYear();
 
   let list = friends.map(f => {
-    let d = new Date(year, f.month - 1, f.day);
-    if (d < now) d = new Date(year + 1, f.month - 1, f.day);
+    let d = new Date(year, f.month - 1, f.day, 8, 15, 0);
+    if (d < now) {
+      d = new Date(year + 1, f.month - 1, f.day, 8, 15, 0);
+    }
     return { ...f, date: d };
   });
 
-  list.sort((a,b) => a.date - b.date);
+  list.sort((a, b) => a.date - b.date);
   return list[0];
 }
 
 function update() {
   const now = new Date();
-  const hour = now.getHours();
-  const minute = now.getMinutes();
+  const msg = document.getElementById("message");
 
-  const today = friends.find(f =>
+  const next = getNextEvent(now);
+
+  const todayBirthday = friends.find(f =>
     f.month === now.getMonth() + 1 &&
     f.day === now.getDate()
   );
 
-  const msg = document.getElementById("message");
+  const todayRevealTime = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate(),
+    8, 15, 0
+  );
 
-  if (hour === 8 && minute === 15) {
-    if (today) {
-      msg.innerHTML = `🎉 IDAG FYLLER <b>${today.name}</b> ÅR 🎂`;
-    } else {
-      msg.innerHTML = `Ingen fyller år idag`;
-    }
-
-    document.getElementById("countdown").style.display = "none";
-    return;
-  } else {
-    document.getElementById("countdown").style.display = "flex";
+  // 🔒 LÅS OM DET ÄR FÖDELSEDAG IDAG OCH INNAN 08:15
+  if (todayBirthday && now < todayRevealTime) {
+    msg.innerHTML = "🎂 Födelsedag idag – låst fram till 08:15";
   }
 
-  const next = getNext(now);
-  msg.innerHTML = `Nästa upp: ${next.name}`;
+  // 🎉 EFTER 08:15 VISA NAMN
+  else if (todayBirthday && now >= todayRevealTime) {
+    msg.innerHTML = `🎉 IDAG FYLLER <b>${todayBirthday.name}</b> ÅR 🎂`;
+  }
 
+  // ⏳ ANNARS VISA NÄSTA
+  else {
+    msg.innerHTML = `Nästa upp: ${next.name}`;
+  }
+
+  // countdown
   const diff = next.date - now;
 
   document.getElementById("days").textContent = Math.floor(diff / (1000*60*60*24));
