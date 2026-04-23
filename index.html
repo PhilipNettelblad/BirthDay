@@ -99,7 +99,19 @@
     min-height: 40px;
   }
 
-  /* 📱 extra mobilfix */
+  /* 🔧 HEMLIG DEBUG-KNAPP */
+  #debugReveal {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    width: 10px;
+    height: 10px;
+    opacity: 0.02;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+  }
+
   @media (max-width: 480px) {
     #countdown {
       gap: 0.6rem;
@@ -124,6 +136,9 @@
 </div>
 
 <div id="message"></div>
+
+<!-- 🔧 HIDDEN BUTTON -->
+<button id="debugReveal"></button>
 
 <script>
 const friends = [
@@ -157,6 +172,21 @@ function getNextEvent(now) {
   return list[0];
 }
 
+function forceReveal() {
+  const now = new Date();
+
+  const today = friends.find(f =>
+    f.month === now.getMonth() + 1 &&
+    f.day === now.getDate()
+  );
+
+  const msg = document.getElementById("message");
+
+  if (today) {
+    msg.innerHTML = `🎉 ${today.name} fyller år idag 🎂`;
+  }
+}
+
 function update() {
   const now = new Date();
   const msg = document.getElementById("message");
@@ -175,22 +205,12 @@ function update() {
     8, 15, 0
   );
 
-  // 🎂 IDAG MEN INTE DAGS ÄN
-  if (today && now < revealTime) {
-    msg.innerHTML = "";
-  }
-
-  // 🎉 REVEAL KL 08:15
-  else if (today && now >= revealTime && now < new Date(revealTime.getTime() + 24*60*60*1000)) {
+  if (today && now >= revealTime && now < new Date(revealTime.getTime() + 24*60*60*1000)) {
     msg.innerHTML = `🎉 ${today.name} fyller år idag 🎂`;
-  }
-
-  // ⏳ INGEN FÖDELSEDAG IDAG → VISA INGENTING NAMN
-  else {
+  } else {
     msg.innerHTML = "";
   }
 
-  // COUNTDOWN
   const diff = next.date - now;
 
   document.getElementById("days").textContent = Math.floor(diff / (1000*60*60*24));
@@ -201,6 +221,9 @@ function update() {
 
 setInterval(update, 1000);
 update();
+
+/* 🔧 bind hidden button */
+document.getElementById("debugReveal").addEventListener("click", forceReveal);
 </script>
 
 </body>
