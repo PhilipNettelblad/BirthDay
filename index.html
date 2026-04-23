@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Birthday Countdown</title>
+  <title>Birthday System</title>
 
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
 
@@ -57,8 +57,6 @@
     #countdown {
       display: flex;
       gap: 1.5rem;
-      flex-wrap: wrap;
-      justify-content: center;
     }
 
     .box {
@@ -130,19 +128,16 @@ const friends = [
   { name: "Simon", month: 10, day: 21 }
 ];
 
-// nästa event = födelsedag kl 08:15
 function getNextEvent(now) {
   const year = now.getFullYear();
 
   let list = friends.map(f => {
     let d = new Date(year, f.month - 1, f.day, 8, 15, 0);
-    if (d < now) {
-      d = new Date(year + 1, f.month - 1, f.day, 8, 15, 0);
-    }
+    if (d < now) d = new Date(year + 1, f.month - 1, f.day, 8, 15, 0);
     return { ...f, date: d };
   });
 
-  list.sort((a, b) => a.date - b.date);
+  list.sort((a,b) => a.date - b.date);
   return list[0];
 }
 
@@ -152,34 +147,34 @@ function update() {
 
   const next = getNextEvent(now);
 
-  const todayBirthday = friends.find(f =>
+  const today = friends.find(f =>
     f.month === now.getMonth() + 1 &&
     f.day === now.getDate()
   );
 
-  const todayRevealTime = new Date(
+  const revealTime = new Date(
     now.getFullYear(),
     now.getMonth(),
     now.getDate(),
     8, 15, 0
   );
 
-  // 🔒 LÅS OM DET ÄR FÖDELSEDAG IDAG OCH INNAN 08:15
-  if (todayBirthday && now < todayRevealTime) {
-    msg.innerHTML = "🎂 Födelsedag idag – låst fram till 08:15";
+  // 🎂 IDAG MEN INTE DAGS ÄN
+  if (today && now < revealTime) {
+    msg.innerHTML = "";
   }
 
-  // 🎉 EFTER 08:15 VISA NAMN
-  else if (todayBirthday && now >= todayRevealTime) {
-    msg.innerHTML = `🎉 IDAG FYLLER <b>${todayBirthday.name}</b> ÅR 🎂`;
+  // 🎉 REVEAL KL 08:15
+  else if (today && now >= revealTime && now < new Date(revealTime.getTime() + 24*60*60*1000)) {
+    msg.innerHTML = `🎉 ${today.name} fyller år idag 🎂`;
   }
 
-  // ⏳ ANNARS VISA NÄSTA
+  // ⏳ INGEN FÖDELSEDAG IDAG → VISA INGENTING NAMN
   else {
-    msg.innerHTML = `Nästa upp: ${next.name}`;
+    msg.innerHTML = "";
   }
 
-  // countdown
+  // COUNTDOWN
   const diff = next.date - now;
 
   document.getElementById("days").textContent = Math.floor(diff / (1000*60*60*24));
